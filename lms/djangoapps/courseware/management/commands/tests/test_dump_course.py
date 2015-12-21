@@ -24,6 +24,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+XML_COURSE_DIRS = ['toy', 'simple']
 MAPPINGS = {}
 
 TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
