@@ -24,14 +24,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-XML_COURSE_DIRS = ['toy', 'simple']
-MAPPINGS = {
-    'edX/toy/2012_Fall': 'xml',
-    'edX/simple/2012_Fall': 'xml',
-}
+MAPPINGS = {}
 
 TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
-    DATA_DIR, MAPPINGS, include_xml=True, xml_source_dirs=XML_COURSE_DIRS,
+    DATA_DIR, MAPPINGS
 )
 
 
