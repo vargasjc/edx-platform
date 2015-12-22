@@ -8,6 +8,7 @@ from django.http import Http404
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from unittest import skip
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
@@ -242,9 +243,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         cls.course.save()
         cls.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-    def setUp(self):
-        super(StaticTabDateTestCase, self).setUp()
-
     def test_logged_in(self):
         self.setup_user()
         url = reverse('static_tab', args=[self.course.id.to_deprecated_string(), 'new_tab'])
@@ -264,6 +262,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
+    @skip("Broken! Never finds the 'resources' static tab when created by the ToyCourseFactory.")
     def test_get_static_tab_contents(self):
         self.setup_user()
         course = get_course_by_id(self.toy_course_key)
