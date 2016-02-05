@@ -32,7 +32,8 @@
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'js/vendor/jasmine-stealth',
             'jasmine.async': 'js/vendor/jasmine.async',
-            'URI': 'js/vendor/URI.min'
+            'URI': 'js/vendor/URI.min',
+            'draggabilly': 'js/vendor/draggabilly.pkgd',
         },
         shim: {
             'gettext': {
@@ -149,7 +150,10 @@
             },
             "sinon": {
                 exports: "sinon"
-            }
+            },
+            'draggabilly': {
+                exports: 'Draggabilly'
+            },
         }
     });
 

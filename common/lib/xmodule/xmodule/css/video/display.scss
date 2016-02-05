@@ -196,7 +196,7 @@ html:not('.afontgarde') .icon-fallback-img {
     background-color: black;
     position: relative;
 
-    .video-player-pre, 
+    .video-player-pre,
     .video-player-post {
        height: 50px;
        background-color: rgb(17, 16, 16) // UXPL grayscale black;
@@ -261,6 +261,28 @@ html:not('.afontgarde') .icon-fallback-img {
       padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
       background: rgba(0, 0, 0, .75);
       color: $yellow;
+
+        &:before {
+            position: absolute;
+            display: inline-block;
+            top: 50%;
+            @include left($baseline);
+            margin-top: -.6em;
+            font-family: 'FontAwesome';
+            content: "\f142";
+            color: $white;
+            opacity: 0.5;
+        }
+
+        &:hover,
+        &.is-dragging {
+            background: rgba(0, 0, 0, 1.0);
+            cursor: move;
+
+            &:before {
+                opacity: 1.0;
+            }
+        }
     }
 
     .video-player {
@@ -283,7 +305,7 @@ html:not('.afontgarde') .icon-fallback-img {
         width: 100%;
       }
 
-      h3 {
+      h4 {
         text-align: center;
         color: white;
 
