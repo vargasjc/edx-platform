@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        all_courses = modulestore().get_courses()
+        all_courses = modulestore().get_course_summaries()
         number_of_courses = len(all_courses)
 
         for index, course in enumerate(all_courses):
