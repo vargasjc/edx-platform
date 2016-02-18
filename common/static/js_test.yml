@@ -38,6 +38,7 @@ lib_paths:
     - js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
+    - js/vendor/draggabilly.pkgd.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
     - js/test/i18n.js

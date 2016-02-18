@@ -150,7 +150,7 @@ if ( typeof define === 'function' && define.amd ) {
  * class helper functions
  * from bonzo https://github.com/ded/bonzo
  * MIT license
- * 
+ *
  * classie.has( elem, 'my-class' ) -> true/false
  * classie.add( elem, 'my-new-class' )
  * classie.remove( elem, 'my-unwanted-class' )
@@ -629,7 +629,7 @@ if ( typeof define === 'function' && define.amd ) {
  */
 
 ;(function () {
-    
+
 
     /**
      * Class for managing events.
@@ -1104,7 +1104,7 @@ if ( typeof define === 'function' && define.amd ) {
 /*global define: false, module: false, require: false */
 
 ( function( window, factory ) {
-  
+
   // universal module definition
 
   if ( typeof define == 'function' && define.amd ) {
@@ -1421,7 +1421,7 @@ return Unipointer;
 
 ( function( window, factory ) {
   /*global define: false, module: false, require: false */
-  
+
   // universal module definition
 
   if ( typeof define == 'function' && define.amd ) {
@@ -1744,7 +1744,7 @@ return Unidragger;
  */
 
 ( function( window, factory ) {
-  
+
 
   if ( typeof define == 'function' && define.amd ) {
     // AMD
