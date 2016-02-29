@@ -9,29 +9,18 @@ import os
 
 class Command(BaseCommand):
     """
-    Generates CSVs to be used with neo4j's csv import tool (this is much
+    Generates TSVs to be used with neo4j's csv import tool (this is much
     faster for bulk importing than using py2neo, which updates neo4j over
     a REST api)
+
+
     """
-    help = '''
-    Here's an example neo4j-import command:
-
-    ./bin/neo4j-import --id-type string --nodes:chapter chapter.csv \
-    --nodes:discussion discussion.csv --nodes:html html.csv \
-    --nodes:openassessment openassessment.csv
-    --nodes:problem problem.csv \
-    --nodes:sequential sequential.csv --nodes:vertical vertical.csv \
-    --nodes:video video.csv --nodes:course course.csv \
-    --relationships:PARENT_OF relationships.csv \
-    --into data/coursegraph-demo \
-    --multiline-fields=true
-
-    (This could be refactored to automatically generate which nodes files
-    to use based off of csv files present in a directory)
-    '''
-
     # {<block_type>: [<field_name>]}
     field_names_by_type = {}
+    csv_dir = "coursegraph2"
+    neo4j_root = ""
+
+    def serialize_item(self, item, course_key):
 
 
     def handle(self, *args, **options):
@@ -98,26 +87,26 @@ class Command(BaseCommand):
 
         print self.field_names_by_type.keys()
 
-        print "DONE"
+        print "finished exporting modulestore data to csv"
+        print "now run the following command to import these data into noo4j:"
+        print self.generate_bulk_import_command()
 
 
     def add_to_relationship_csv(self, relationships, create=False):
         rows = [[':START_ID', ':END_ID']] if create else []
         rows.extend(relationships)
-        mode = 'w' if create else 'a'
-        with open('/tmp/relationships.tsv', mode) as csvfile:
-            self._write_results_to_tsv(rows, csvfile)
+        with open('coursegraph2/relationships.csv', 'a') as csvfile:
+            self._write_results_to_csv(rows, csvfile)
 
 
-    def _write_results_to_tsv(self, rows, output_file):
+    def _write_results_to_csv(self, rows, output_file):
         """
         Writes each row to a TSV file.
         Fields are separated by tabs, no quote character.
         Output would be encoded as utf-8.
-        All embeded tabs(\t), newlines(\n), and carriage returns(\r) are escaped.
         """
 
-        writer = csv.writer(output_file, delimiter="\t", quoting=csv.QUOTE_NONE, quotechar='', lineterminator='\n')
+        writer = csv.writer(output_file)
         converted_rows = []
         for row in rows:
             converted_row = [self._normalize_value(val) for val in row]
@@ -127,7 +116,9 @@ class Command(BaseCommand):
 
     def _normalize_value(self, value):
         if value is None: value='NULL'
-        value = unicode(value).encode('utf-8').replace('\\', '\\\\').replace('\r', '\\r').replace('\t','\\t').replace('\n', '\\n')
+        value = unicode(value).encode('utf-8')
+        # neo4j has an annoying thing where it freaks out if a field begins
+        # with a quotation mark
         while value.startswith('"') or value.startswith("'"):
             value = value.strip('"')
             value = value.strip("'")
@@ -153,8 +144,30 @@ class Command(BaseCommand):
                 row = [unicode(fields[field_name]) for field_name in field_names]
                 rows.append(row)
 
-            mode = 'w' if create else 'a'
-            with open('/tmp/{}.tsv'.format(block_type), mode) as csvfile:
-                self._write_results_to_tsv(rows, csvfile)
+            with open(self.csv_dir + '/{}.csv'.format(block_type), 'a') as csvfile:
+                self._write_results_to_csv(rows, csvfile)
 
 
+    def generate_bulk_import_command(self):
+        """
+        Generates the command to be used for
+        """
+
+        command = "{neo4j_root}/bin/neo4j-import --id-type string"
+        for filename in os.listdir(self.csv_dir):
+            if filename.endswith(".csv") and filename != "relationships.csv":
+                name = filename[:-4]  # cut off .csv
+                node_info = " --nodes:{name} coursegraph2/{filename}".format(
+                    name=name, filename=filename
+                )
+                command += node_info
+
+        command += " --relationships:PARENT_OF relationships.csv"
+        command += " --into {neo4j_root}/data/coursegraph-demo"
+        command += " --multiline-fields=true"
+        command += " --quote=''"
+        # command += " --delimiter=TAB"
+        # we need to set --bad-tolerance because old mongo has a lot of
+        # dangling pointers
+        command += " --bad-tolerance=1000000"
+        return command.format(neo4j_root=self.neo4j_root)
