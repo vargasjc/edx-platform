@@ -27,10 +27,6 @@ DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['toy', 'simple']
 MAPPINGS = {}
 
-TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
-    DATA_DIR, MAPPINGS
-)
-
 
 @attr('shard_1')
 class CommandsTestBase(ModuleStoreTestCase):
@@ -200,15 +196,6 @@ class CommandsTestBase(ModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
-
-
-class CommandsXMLTestCase(CommandsTestBase):
-    """
-    Test case for management commands with the xml modulestore present.
-
-    """
-    MODULESTORE = TEST_DATA_MIXED_XML_MODULESTORE
-    __test__ = True
 
 
 class CommandsMongoTestCase(CommandsTestBase):
