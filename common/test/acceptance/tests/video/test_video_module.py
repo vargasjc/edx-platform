@@ -1209,18 +1209,22 @@ class DragAndDropTest(VideoBaseTest):
 
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
         self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('html5'))
         self.video.show_closed_captions()
         self.video.wait_for_closed_captions()
         self.assertTrue(self.video.is_closed_captions_visible)
 
-        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
-        captions_starting_location = captions.location
-
         action = ActionChains(self.browser)
-        action.drag_and_drop_by_offset(captions, 0, -50).perform()
-        captions_dropped_location = captions.location
-        self.assertEqual(captions_dropped_location.get('y') + 50,
-            captions_starting_location.get('y'), 'Closed captions did not get dragged.')
+        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
+
+        captions_start = captions.location
+        action.drag_and_drop_by_offset(captions, 0, -15).perform()
+        captions_end = captions.location
+        self.assertEqual(
+            captions_end.get('y') + 15,
+            captions_start.get('y'),
+            'Closed captions did not get dragged.'
+        )
 
 
 @attr('a11y')

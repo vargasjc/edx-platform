@@ -34,7 +34,8 @@
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
             'js/bookmarks/bookmarks_factory',
-            'js/learner_dashboard/program_list_factory'
+            'js/learner_dashboard/program_list_factory',
+            'js/vendor/draggabilly',
         ]),
 
         /**

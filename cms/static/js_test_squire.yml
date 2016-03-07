@@ -75,6 +75,7 @@ src_paths:
     - common/js
     - edx-pattern-library/js
     - edx-ui-toolkit/js
+    - js/vendor/afontgarde
 
 # Paths to spec (test) JavaScript files
 spec_paths:

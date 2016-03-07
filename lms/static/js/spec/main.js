@@ -65,7 +65,10 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
+            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
+            'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
+            'edxicons': 'xmodule_js/common_static/js/vendor/afontgarde/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -624,8 +627,19 @@
                     'xmodule_js/common_static/coffee/src/discussion/utils'
                 ],
                 exports: 'DiscussionSpecHelper'
+            },
+            'draggabilly':  {
+                exports: 'Draggabilly'
+            },
+            'modernizr': {
+                exports: 'Modernizr'
+            },
+            'afontgarde': {
+                exports: 'AFontGarde'
+            },
+            'edxicons': {
+                exports: 'edxicons'
             }
-
         }
     });
 

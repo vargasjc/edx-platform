@@ -3,9 +3,14 @@
     'use strict';
 
     define(
-    'video/09_video_caption.js',
-    ['video/00_sjson.js', 'video/00_async_process.js', 'draggabilly'],
-    function (Sjson, AsyncProcess, Draggabilly) {
+    'video/09_video_caption.js',[
+        'video/00_sjson.js',
+        'video/00_async_process.js',
+        'draggabilly',
+        'modernizr',
+        'afontgarde',
+        'edxicons'
+    ], function (Sjson, AsyncProcess, Draggabilly) {
 
         /**
          * @desc VideoCaption module exports a function.
@@ -51,7 +56,7 @@
                         '<span class="icon-fallback-img">',
                             '<span class="icon fa fa-cc" aria-hidden="true"></span>',
                             '<span class="sr control-text">',
-                                gettext('Turn on closed captioning'),
+                                window.gettext('Turn on closed captioning'),
                             '</span>',
                         '</span>',
                     '</button>',
@@ -59,19 +64,18 @@
                         '<span class="icon-fallback-img">',
                             '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
                             '<span class="sr control-text">',
-                                gettext('Turn off transcript'),
+                                window.gettext('Turn off transcript'),
                             '</span>',
                         '</span>',
                     '</button>',
                     '<div class="lang menu-container" role="application">',
                         '<button class="control language-menu" aria-label="',
-                            /* jshint maxlen:250 */
-                            gettext('Language: Press the UP arrow key to enter the language menu, then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'),
+                            window.gettext('Language: Press the UP arrow key to enter the language menu, then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'),  // jshint ignore:line
                             '" aria-disabled="false">',
                             '<span class="icon-fallback-img">',
                                 '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
                                 '<span class="sr control-text">',
-                                    gettext('Open language menu'),
+                                    window.gettext('Open language menu'),
                                 '</span>',
                             '</span>',
                         '</button>',
@@ -80,12 +84,8 @@
             ].join(''),
 
             template: [
-                '<div class="subtitles" role="region" aria-label="',
-                    /* jshint maxlen:200 */
-                    gettext('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.'),
-                    '">',
-                    '<ol id="transcript-captions" class="subtitles-menu">',
-                    '</ol>',
+                '<div class="subtitles" role="region" aria-label="' + window.gettext("Activating an item in this group will skip to the corresponding point in the video.") + '">',  // jshint ignore:line
+                    '<ol id="transcript-captions" class="subtitles-menu"></ol>',
                 '</div>'
             ].join(''),
 
@@ -476,6 +476,18 @@
                 };
             },
 
+            showTemporaryCaptionMessage: function(self) {
+
+                window.edx.HtmlUtils.setHtml(
+                    self.subtitlesEl.find('.subtitles-menu').html,
+                    window.edx.HtmlUtils.joinHtml(
+                        window.edx.HtmlUtils.HTML('<li>'),
+                        window.gettext('Transcript will be displayed when you start playing the video.'), // jshint ignore:line
+                        window.edx.HtmlUtils.HTML('</li>')
+                    )
+                );
+            },
+
             /**
             * @desc Fetch the caption file specified by the user. Upon successful
             *     receipt of the file, the captions will be rendered.
@@ -537,12 +549,7 @@
                             }
                         } else {
                             if (state.isTouch) {
-                                self.subtitlesEl.find('.subtitles-menu').html(
-                                    gettext(
-                                        '<li>Transcript will be displayed when ' +
-                                        'you start playing the video.</li>'
-                                    )
-                                );
+                                this.showTemporaryCaptionMessage(self);
                             } else {
                                 self.renderCaption(start, captions);
                             }
@@ -1103,14 +1110,14 @@
                 this.captionControlEl
                     .addClass('is-active')
                     .find('.control-text')
-                        .text(gettext('Hide closed captions'));
+                        .text(window.gettext('Hide closed captions'));
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
                         .text(this.subtitlesEl.find('.current').text());
                 } else {
                     this.captionDisplayEl
-                        .text(gettext('(Caption will be displayed when you start playing the video.)'));
+                        .text(window.gettext('(Caption will be displayed when you start playing the video.)'));
                 }
             },
 
@@ -1124,7 +1131,7 @@
                 this.captionControlEl
                     .removeClass('is-active')
                     .find('.control-text')
-                        .text(gettext('Turn on closed captioning'));
+                        .text(window.gettext('Turn on closed captioning'));
             },
 
             updateCaptioningCookie: function(method) {
@@ -1170,7 +1177,7 @@
                 if (hide_captions) {
                     state.captionsHidden = true;
                     state.el.addClass('closed');
-                    text = gettext('Turn on transcripts');
+                    text = window.gettext('Turn on transcripts');
                     if (trigger_event) {
                         this.state.el.trigger('captions:hide');
                     }
@@ -1178,12 +1185,12 @@
                     transcriptControlEl
                         .removeClass('is-active')
                         .find('.control-text')
-                            .text(gettext(text));
+                            .text(window.gettext(text));
                 } else {
                     state.captionsHidden = false;
                     state.el.removeClass('closed');
                     this.scrollCaption();
-                    text = gettext('Turn off transcripts');
+                    text = window.gettext('Turn off transcripts');
                     if (trigger_event) {
                         this.state.el.trigger('captions:show');
                     }
@@ -1191,7 +1198,7 @@
                     transcriptControlEl
                         .addClass('is-active')
                         .find('.control-text')
-                            .text(gettext(text));
+                            .text(window.gettext(text));
                 }
 
                 if (state.resizer) {
