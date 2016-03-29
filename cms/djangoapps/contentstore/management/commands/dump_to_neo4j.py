@@ -6,20 +6,85 @@ from collections import defaultdict
 import gc
 import os
 
-
-class Command(BaseCommand):
+class ModuleStoreSerializer(object):
     """
-    Generates TSVs to be used with neo4j's csv import tool (this is much
-    faster for bulk importing than using py2neo, which updates neo4j over
-    a REST api)
-
-    Until, of course, we add bulk import to py2neo :)
-
+    Class with functionality to serialize a modulestore to CSVs:
+    One document with information on kinds of
     """
-    # {<block_type>: [<field_name>]}
-    field_names_by_type = {}
-    csv_dir = "coursegraph2"
-    neo4j_root = ""
+    def __init__(self, csv_dir, neo4j_root=None):
+        self.csv_dir = csv_dir
+        self.neo4j_root = neo4j_root
+
+        # caches field names for each block type
+        self.field_names_by_block_type = {}
+        self.all_courses = modulestore().get_course_summaries()
+
+    def dump_to_csv(self):
+        for index, course in enumerate(self.all_courses):
+            self.dump_course_items_to_csv(course.id)
+
+    def dump_course_items_to_csv(course_key):
+        blocks_by_type = self.serialize_items(items, course.id)
+        self.dump_blocks_to_csv(blocks_by_type)
+
+        relationships = self.get_relationships_from_items(items)
+        self.dump_relationships_to_csv()
+
+    def dump_blocks_to_csv(self, blocks_by_type):
+        for block_type, serialized_xblocks in blocks_by_type.iteritems():
+            field_names = self.get_field_names_for_type(block_type, serialized_xblocks)
+
+            rows = []
+            for serialized in serialized_xblocks:
+                row = [
+                    self.normalize_value(serialized[field_name])
+                    for field_name
+                    in field_names
+                ]
+                rows.append(row)
+
+            filename ='{csv_dir}/{block_type}.csv'.format(
+                csv_dir=self.csv_dir, block_type=block_type
+            )
+
+            with open(filename, 'a') as csvfile:
+                writer = csv.writer(csvfile)
+                if csvfile.tell() == 0:
+                    writer.writerow(field_names)
+                writer.writerows(rows)
+
+    def dump_relationships_to_csv(self, relationships):
+        rows = [] if create else []
+        rows.extend(relationships)
+        with open('{csv_dir}/relationships.csv'.format(csv_dir=self.csv_dir), 'a') as csvfile:
+            # if this file hasn't been written to yet, add a header
+            writer = csv.writer(output_file)
+            if csvfile.tell() == 0:
+                writer.writerow([':START_ID', ':END_ID'])
+
+            writer.writerows(rows)
+
+    def normalize_value(self, value):
+        if value is None:
+            value = 'NULL'
+        value = unicode(value).encode('utf-8')
+        # neo4j has an annoying thing where it freaks out if a field begins
+        # with a quotation mark
+        while value.startswith('"') or value.startswith("'"):
+            value = value.strip('"')
+            value = value.strip("'")
+
+        return value
+
+    def get_field_names_for_type(block_type, serialized_xblocks):
+        field_names = self.field_names_by_type.get(block_type)
+        if field_names is None:
+            field_names = serialized_xblocks[0].keys()
+            field_names.remove('type:LABEL') ## this needs to be first for some reason
+            field_names = ['type:LABEL'] + field_names
+            self.field_names_by_type[block_type] = field_names
+
+        return field_names
 
     def serialize_item(self, item, course_key):
         # convert all fields to a dict and filter out parent and children field
@@ -61,8 +126,6 @@ class Command(BaseCommand):
 
         return blocks_by_type
 
-
-
     def get_relationships_from_items(self, items):
         relationships = []
         for item in items:
@@ -72,98 +135,6 @@ class Command(BaseCommand):
                     child_loc = unicode(child)
                     relationships.append([parent_loc, child_loc])
         return relationships
-
-
-
-
-    def handle(self, *args, **options):
-
-        all_courses = modulestore().get_course_summaries()
-        number_of_courses = len(all_courses)
-
-        for index, course in enumerate(all_courses):
-
-            items = modulestore().get_items(course.id)
-            print u"dumping {} (course {}/{}) ({} items)".format(
-                course.id, index + 1, number_of_courses, len(items)
-            )
-
-            blocks_by_type = self.serialize_items(items, course.id)
-
-            relationships = self.get_relationships_from_items(items)
-
-            self.add_block_info_to_csvs(blocks_by_type)
-
-            self.add_to_relationship_csv(relationships)
-
-        print self.field_names_by_type.keys()
-
-        print "finished exporting modulestore data to csv"
-        print "now run the following command to import these data into noo4j:"
-        print self.generate_bulk_import_command()
-
-
-    def add_to_relationship_csv(self, relationships):
-        rows = [] if create else []
-        rows.extend(relationships)
-        with open('coursegraph2/relationships.csv', 'a') as csvfile:
-            # if this file hasn't been written to yet, add a header
-            writer = csv.writer(output_file)
-            if csvfile.tell() == 0:
-                writer.writerow([':START_ID', ':END_ID'])
-
-            writer.writerows(rows)
-
-
-    def _write_results_to_csv(self, rows, writer):
-        """
-        Writes each row to a CSV file.
-        Fields are separated by tabs, no quote character.
-        Output would be encoded as utf-8.
-        """
-        writer.writerows(rows)
-
-
-    def _normalize_value(self, value):
-        if value is None:
-            value = 'NULL'
-        value = unicode(value).encode('utf-8')
-        # neo4j has an annoying thing where it freaks out if a field begins
-        # with a quotation mark
-        while value.startswith('"') or value.startswith("'"):
-            value = value.strip('"')
-            value = value.strip("'")
-
-        return value
-
-    def get_field_names_for_type(block_type, serialized_xblocks):
-        field_names = self.field_names_by_type.get(block_type)
-        if field_names is None:
-            field_names = serialized_xblocks[0].keys()
-            field_names.remove('type:LABEL') ## this needs to be first for some reason
-            field_names = ['type:LABEL'] + field_names
-            self.field_names_by_type[block_type] = field_names
-
-        return field_names
-
-    def add_block_info_to_csvs(self, blocks_by_type):
-        for block_type, serialized_xblocks in blocks_by_type.iteritems():
-            field_names = self.get_field_names_for_type(block_type, serialized_xblocks)
-
-            rows = []
-            for serialized in serialized_xblocks:
-                row = [
-                    self._normalize_value(serialized[field_name])
-                    for field_name
-                    in field_names
-                ]
-                rows.append(row)
-
-            with open(self.csv_dir + '/{}.csv'.format(block_type), 'a') as csvfile:
-                writer = csv.writer(csvfile)
-                if csvfile.tell() == 0:
-                    writer.writerow(field_names)
-                writer.writerows(rows)
 
 
     def generate_bulk_import_command(self):
@@ -189,3 +160,23 @@ class Command(BaseCommand):
         # dangling pointers
         command += " --bad-tolerance=1000000"
         return command.format(neo4j_root=self.neo4j_root)
+
+
+
+class Command(BaseCommand):
+    """
+    Generates CSVs to be used with neo4j's csv import tool (this is much
+    faster for bulk importing than using py2neo, which updates neo4j over
+    a REST api)
+    """
+
+    def handle(self, *args, **options):
+        csv_dir = options["csv_dir"]
+        neo4j_root = options["neo4j_root"]
+        module_store_serializer = ModuleStoreSerializer(csv_dir, neo4j_root)
+        module_store_serializer.dump_to_csv()
+        print("Use the following command to import your csvs into neo4j")
+        print(module_store_serializer.generate_bulk_import_command())
+
+
+
