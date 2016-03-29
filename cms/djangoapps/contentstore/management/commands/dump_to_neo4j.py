@@ -137,13 +137,29 @@ class ModuleStoreSerializer(object):
         return relationships
 
 
-    def generate_bulk_import_command(self):
+
+class Command(BaseCommand):
+    """
+    Generates CSVs to be used with neo4j's csv import tool (this is much
+    faster for bulk importing than using py2neo, which updates neo4j over
+    a REST api)
+    """
+
+    def handle(self, *args, **options):
+        csv_dir = options["csv_dir"]
+        neo4j_root = options["neo4j_root"]
+        module_store_serializer = ModuleStoreSerializer(csv_dir, neo4j_root)
+        module_store_serializer.dump_to_csv()
+        print("Use the following command to import your csvs into neo4j")
+        print(self.generate_bulk_import_command(module_store_serializer))
+
+    def generate_bulk_import_command(self, module_store_serializer):
         """
         Generates the command to be used for
         """
 
         command = "{neo4j_root}/bin/neo4j-import --id-type string"
-        for filename in os.listdir(self.csv_dir):
+        for filename in os.listdir(module_store_serializer.csv_dir):
             if filename.endswith(".csv") and filename != "relationships.csv":
                 name = filename[:-4]  # cut off .csv
                 node_info = " --nodes:{name} coursegraph2/{filename}".format(
@@ -159,24 +175,7 @@ class ModuleStoreSerializer(object):
         # we need to set --bad-tolerance because old mongo has a lot of
         # dangling pointers
         command += " --bad-tolerance=1000000"
-        return command.format(neo4j_root=self.neo4j_root)
-
-
-
-class Command(BaseCommand):
-    """
-    Generates CSVs to be used with neo4j's csv import tool (this is much
-    faster for bulk importing than using py2neo, which updates neo4j over
-    a REST api)
-    """
-
-    def handle(self, *args, **options):
-        csv_dir = options["csv_dir"]
-        neo4j_root = options["neo4j_root"]
-        module_store_serializer = ModuleStoreSerializer(csv_dir, neo4j_root)
-        module_store_serializer.dump_to_csv()
-        print("Use the following command to import your csvs into neo4j")
-        print(module_store_serializer.generate_bulk_import_command())
+        return command.format(neo4j_root=module_store_serializer.neo4j_root)
 
 
 
