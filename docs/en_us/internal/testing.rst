@@ -70,6 +70,12 @@ UI Acceptance Tests
    write end-user acceptance tests directly in Python, using the
    framework to maximize reliability and maintainability.
 
+Internationalization Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  Any new text that is added should be internationalized and translated.
+
+
 Test Locations
 --------------
 
@@ -609,6 +615,32 @@ During acceptance test execution, Django log files are written to
 ``test_root/log/cms_acceptance.log``.
 
 **Note**: The acceptance tests can *not* currently run in parallel.
+
+
+Testing internationalization with dummy translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any text you add to the platform should be internationalized. To generate
+translations for your new strings, run the following:
+
+::
+
+    paver i18n_dummy
+
+This will generate dummy translations for the individual language files.
+
+You should then run:
+
+::
+
+    ./manage.py lms compilejsi18n
+
+To compile the translations and make them available for your local environment
+and sandbox previewing.
+
+This second command is normally run during each release. Previewing your
+translations locally won't work without first running it.
+
 
 Debugging Acceptance Tests on Vagrant
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
