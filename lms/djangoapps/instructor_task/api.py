@@ -446,6 +446,7 @@ def generate_certificates_for_students(request, course_key, students=None):  # p
     """
     if students:
         task_type = 'generate_certificates_certain_student'
+        # HACK: we currently can't support more than 20 students per task
         students = [student.id for student in students]
         task_input = {'students': students}
     else:
@@ -466,28 +467,26 @@ def generate_certificates_for_students(request, course_key, students=None):  # p
     return instructor_task
 
 
-def regenerate_certificates(request, course_key, statuses_to_regenerate, students=None):
+def regenerate_certificates(request, course_key, statuses_to_regenerate):
     """
-    Submits a task to regenerate certificates for given students enrolled in the course or
-    all students if argument 'students' is None.
-    Regenerate Certificate only if the status of the existing generated certificate is in 'statuses_to_regenerate'
+    Submits a task to regenerate certificates for all students.
+
+    Regenerate certificate only if the status of the existing generated
+    certificates is in 'statuses_to_regenerate'
     list passed in the arguments.
 
     Raises AlreadyRunningError if certificates are currently being generated.
     """
-    if students:
-        task_type = 'regenerate_certificates_certain_student'
-        students = [student.id for student in students]
-        task_input = {'students': students}
-    else:
-        task_type = 'regenerate_certificates_all_student'
-        task_input = {}
+    task_type = 'regenerate_certificates_all_student'
+    task_input = {}
 
     task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
     task_class = generate_certificates
     task_key = ""
 
-    instructor_task = submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    instructor_task = submit_task(
+        request, task_type, task_class, course_key, task_input, task_key
+    )
 
     CertificateGenerationHistory.objects.create(
         course_id=course_key,

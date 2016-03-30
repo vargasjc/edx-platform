@@ -708,6 +708,26 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
         self.client.login(username=self.global_staff.username, password='test')
 
+    def create_and_whitelist_users(self, number_of_users):
+        """
+        Generate a list of whitelisted users in a course.
+        """
+        users = [UserFactory() for __ in xrange(number_of_users)]
+        list_of_exceptions = []
+        for user in users:
+            whitelist_instance = CertificateWhitelistFactory.create(
+                user=user, course_id=self.course.id
+            )
+            list_of_exceptions.append({
+                "id": whitelist_instance.id,
+                "user_name": whitelist_instance.user.username,
+                "notes": whitelist_instance.notes,
+                "user_email": whitelist_instance.user.email,
+                "user_id": whitelist_instance.user.id,
+            })
+
+        return users, list_of_exceptions
+
     def test_generate_certificate_exceptions_all_students(self):
         """
         Test generate certificates exceptions api endpoint returns success
@@ -735,6 +755,33 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
             res_json['message'],
             u"Certificate generation started for white listed students."
         )
+
+    def test_generate_cerficates_exceptions_many_students(self):
+        users, list_of_exceptions = self.create_and_whitelist_users(25)
+
+        url = reverse(
+            'generate_certificate_exceptions',
+            kwargs={'course_id': unicode(self.course.id), 'generate_for': 'all'}
+        )
+
+        response = self.client.post(
+            url,
+            data=json.dumps(list_of_exceptions),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+
+        res_json = json.loads(response.content)
+
+        # Assert Request is successful
+        self.assertTrue(res_json['success'])
+        # Assert Message
+        self.assertEqual(
+            res_json['message'],
+            u"Certificate generation started for white listed students."
+        )
+
+
 
     def test_generate_certificate_exceptions_invalid_user_list_error(self):
         """

@@ -105,6 +105,7 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
+    chunk,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -3066,7 +3067,14 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 
     if students:
         # generate certificates for students if 'students' list is not empty
-        instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+        # HACK: in order to work around ECOM-3505, where too many students
+        # sent to certificate generation at once caused an error saving
+        # the task information to the database, we chunk the student list
+        # into smaller lists of at most 20
+        for some_students in chunk(students, 20):
+            instructor_task.api.generate_certificates_for_students(
+                request, course_key, students=some_students
+            )
 
     response_payload = {
         'success': True,
@@ -3276,7 +3284,13 @@ def re_validate_certificate(request, course_key, generated_certificate):
 
     # We need to generate certificate only for a single student here
     students = [certificate_invalidation.generated_certificate.user]
-    instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+
+    # HACK: in order to work around ECOM-3505, where too many students
+    # sent to certificate generation at once caused an error saving
+    # the task information to the database, we chunk the student list
+    # into smaller lists of at most 20
+    for some_students in chunk(students, 20):
+        instructor_task.api.generate_certificates_for_students(request, course_key, students=some_students)
 
 
 def validate_request_data_and_get_certificate(certificate_invalidation, course_key):

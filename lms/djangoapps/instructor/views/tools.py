@@ -269,3 +269,15 @@ def add_block_ids(payload):
         for ele in payload['data']:
             if 'module_id' in ele:
                 ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
+
+
+def chunk(iterable, chunk_size):
+    """
+    Generic python function for chunking a iterable into sub lists
+    """
+    for index in xrange(0, len(iterable), chunk_size):
+        # now yield a sub iterable
+        start = index
+        end = min(index + chunk_size, len(iterable))
+        sub_iterable = [iterable[index_2] for index_2 in xrange(start, end)]
+        yield sub_iterable
