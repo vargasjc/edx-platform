@@ -1,5 +1,5 @@
 """
-tests for version based app upgrade middleware
+Tests for Version Based App Upgrade Middleware
 """
 from datetime import datetime
 import ddt
@@ -10,12 +10,13 @@ import mock
 from pytz import UTC
 from mobile_api.middleware import AppVersionUpgrade
 from mobile_api.models import AppVersionConfig
-from request_cache.middleware import RequestCache
 
 
 @ddt.ddt
 class TestAppVersionUpgradeMiddleware(TestCase):
-    """ Tests for version based app upgrade middleware """
+    """
+    Tests for version based app upgrade middleware
+    """
     def setUp(self):
         super(TestAppVersionUpgradeMiddleware, self).setUp()
         self.middleware = AppVersionUpgrade()
@@ -23,7 +24,7 @@ class TestAppVersionUpgradeMiddleware(TestCase):
         cache.clear()
 
     def set_app_version_config(self):
-        """ creates configuration data for platform versions """
+        """ Creates configuration data for platform versions """
         AppVersionConfig(platform="iOS", version="1.1.1", expire_at=None, enabled=True).save()
         AppVersionConfig(
             platform="iOS",
@@ -49,14 +50,13 @@ class TestAppVersionUpgradeMiddleware(TestCase):
         AppVersionConfig(
             platform="Android",
             version="4.4.4",
-            expire_at=datetime(9000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(5000, 01, 01, tzinfo=UTC),
             enabled=True
         ).save()
-        AppVersionConfig(platform="Android", version="6.6.6", expire_at=None, enabled=True).save()
+        AppVersionConfig(platform="Android", version="8.8.8", expire_at=None, enabled=True).save()
 
     def process_middleware(self, user_agent):
-        """ helper function that makes calls to middle process_request and process_response """
-        RequestCache.clear_request_cache()
+        """ Helper function that makes calls to middle process_request and process_response """
         fake_request = HttpRequest()
         fake_request.META['HTTP_USER_AGENT'] = user_agent
         request_response = self.middleware.process_request(fake_request)
@@ -79,13 +79,13 @@ class TestAppVersionUpgradeMiddleware(TestCase):
         self.assertIsNone(request_response)
         self.assertEquals(200, processed_response.status_code)
         self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
-        self.assertNotIn(AppVersionUpgrade.UPGRADE_DEADLINE_HEADER, processed_response)
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
 
     @ddt.data(
         "edX/org.edx.mobile (6.6.6; OS Version 9.2 (Build 13C75))",
         "edX/org.edx.mobile (7.7.7; OS Version 9.2 (Build 13C75))",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/6.6.6",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/7.7.7",
+        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/8.8.8",
+        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/9.9.9",
     )
     def test_no_update(self, user_agent):
         with self.assertNumQueries(2):
@@ -93,55 +93,62 @@ class TestAppVersionUpgradeMiddleware(TestCase):
         self.assertIsNone(request_response)
         self.assertEquals(200, processed_response.status_code)
         self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
-        self.assertNotIn(AppVersionUpgrade.UPGRADE_DEADLINE_HEADER, processed_response)
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
     @ddt.data(
-        "edX/org.edx.mobile (5.1.1; OS Version 9.2 (Build 13C75))",
-        "edX/org.edx.mobile (5.1.1.RC; OS Version 9.2 (Build 13C75))",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/5.1.1",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/5.1.1.RC",
+        ("edX/org.edx.mobile (5.1.1; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("edX/org.edx.mobile (5.1.1.RC; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/5.1.1", "8.8.8"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/5.1.1.RC", "8.8.8"),
     )
-    def test_new_version_available(self, user_agent):
+    @ddt.unpack
+    def test_new_version_available(self, user_agent, latest_version):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNone(request_response)
         self.assertEquals(200, processed_response.status_code)
-        self.assertEqual("6.6.6", processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
-        self.assertNotIn(AppVersionUpgrade.UPGRADE_DEADLINE_HEADER, processed_response)
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
     @ddt.data(
-        "edX/org.edx.mobile (1.0.1; OS Version 9.2 (Build 13C75))",
-        "edX/org.edx.mobile (1.1.1; OS Version 9.2 (Build 13C75))",
-        "edX/org.edx.mobile (2.0.5.RC; OS Version 9.2 (Build 13C75))",
-        "edX/org.edx.mobile (2.2.2; OS Version 9.2 (Build 13C75))",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/1.0.1",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/1.1.1",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/2.0.5.RC",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/2.2.2",
+        ("edX/org.edx.mobile (1.0.1; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("edX/org.edx.mobile (1.1.1; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("edX/org.edx.mobile (2.0.5.RC; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("edX/org.edx.mobile (2.2.2; OS Version 9.2 (Build 13C75))", "6.6.6"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/1.0.1", "8.8.8"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/1.1.1", "8.8.8"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/2.0.5.RC", "8.8.8"),
+        ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/2.2.2", "8.8.8"),
     )
-    def test_version_update_required(self, user_agent):
+    @ddt.unpack
+    def test_version_update_required(self, user_agent, latest_version):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNotNone(request_response)
         self.assertEquals(426, processed_response.status_code)
-        self.assertEqual("6.6.6", processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
     @ddt.data(
-        "edX/org.edx.mobile (4.4.4; OS Version 9.2 (Build 13C75))",
-        "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/4.4.4",
+        ("edX/org.edx.mobile (4.4.4; OS Version 9.2 (Build 13C75))", "6.6.6", '9000-01-01T00:00:00+00:00'),
+        (
+            "Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/4.4.4",
+            "8.8.8",
+            '5000-01-01T00:00:00+00:00',
+        ),
     )
-    def test_version_update_available_with_deadline(self, user_agent):
+    @ddt.unpack
+    def test_version_update_available_with_deadline(self, user_agent, latest_version, upgrade_date):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
         self.assertIsNone(request_response)
         self.assertEquals(200, processed_response.status_code)
-        self.assertEqual("6.6.6", processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
-        self.assertEqual('9000-01-01T00:00:00+00:00', processed_response[AppVersionUpgrade.UPGRADE_DEADLINE_HEADER])
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
+        self.assertEqual(upgrade_date, processed_response[AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER])
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)

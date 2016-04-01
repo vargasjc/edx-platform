@@ -20,7 +20,7 @@ from mobile_api.models import MobileApiConfig
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, remove_user_from_cohort
-from mobile_api.tests.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
+from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
 
 class TestVideoAPITestCase(MobileAPITestCase):

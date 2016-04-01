@@ -17,7 +17,7 @@ class AppVersionConfigAdmin(KeyedConfigurationModelAdmin):
     class Meta(object):
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
-    def get_list_display(self, request):  # pylint: disable=unused-variable
+    def get_list_display(self, __):
         """ defines fields to display in list view """
         return ['change_date', 'changed_by', 'platform', 'version', 'expire_at', 'enabled', 'edit_link']
 

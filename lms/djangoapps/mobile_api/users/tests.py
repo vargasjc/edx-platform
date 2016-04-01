@@ -30,7 +30,7 @@ from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
 from util.testing import UrlResetMixin
 from .. import errors
-from mobile_api.tests.testutils import (
+from mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,

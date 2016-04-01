@@ -10,7 +10,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from milestones.tests.utils import MilestonesTestCaseMixin
 
-from mobile_api.tests.testutils import (
+from ..testutils import (
     MobileAPITestCase, MobileCourseAccessTestMixin, MobileAuthTestMixin
 )
 

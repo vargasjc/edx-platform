@@ -1,5 +1,5 @@
 """
-Platform related operations for Mobile APP
+Platform related Operations for Mobile APP
 """
 import abc
 import re
@@ -17,7 +17,7 @@ class MobilePlatform:
         self.version = version
 
     @classmethod
-    def create_instance(cls, user_agent, user_agent_regex):
+    def get_user_app_platform(cls, user_agent, user_agent_regex):
         """ Returns platform instance if user_agent matches with USER_AGENT_REGEX """
         match = re.search(user_agent_regex, user_agent)
         if match:
@@ -36,12 +36,12 @@ class MobilePlatform:
             instance of one of the supported mobile platforms (i.e. iOS, Android)
         """
         for subclass in PLATFORM_CLASSES.values():
-            instance = subclass.create_instance(user_agent, subclass.USER_AGENT_REGEX)
+            instance = subclass.get_user_app_platform(user_agent, subclass.USER_AGENT_REGEX)
             if instance:
                 return instance
 
 
-class Ios(MobilePlatform):
+class IOS(MobilePlatform):
     """ iOS platform """
     USER_AGENT_REGEX = (r'\((?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?); OS Version [0-9.]+ '
                         r'\(Build [0-9a-zA-Z]*\)\)')
@@ -56,4 +56,4 @@ class Android(MobilePlatform):
 
 
 # a list of all supported mobile platforms
-PLATFORM_CLASSES = {Ios.NAME: Ios, Android.NAME: Android}
+PLATFORM_CLASSES = {IOS.NAME: IOS, Android.NAME: Android}

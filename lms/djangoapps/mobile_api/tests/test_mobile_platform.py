@@ -1,5 +1,5 @@
 """
-tests for platform against mobile app request
+Tests for Platform against Mobile App Request
 """
 import ddt
 from django.test import TestCase
@@ -8,7 +8,9 @@ from mobile_api.mobile_platform import MobilePlatform
 
 @ddt.ddt
 class TestMobilePlatform(TestCase):
-    """ Tests for platform against mobile app request """
+    """
+    Tests for platform against mobile app request
+    """
     def setUp(self):
         super(TestMobilePlatform, self).setUp()
 
