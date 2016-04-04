@@ -1,10 +1,11 @@
-(function (define) {
+(function(define) {
 // VideoCaption module.
     'use strict';
 
-    define(
-    'video/09_video_caption.js',
-    ['video/00_sjson.js', 'video/00_async_process.js'],
+    define('video/09_video_caption.js', [
+        'video/00_sjson.js',
+        'video/00_async_process.js'
+    ],
     function (Sjson, AsyncProcess) {
 
         /**
@@ -467,6 +468,18 @@
                 };
             },
 
+            showTemporaryCaptionMessage: function(self) {
+
+                window.edx.HtmlUtils.setHtml(
+                    self.subtitlesEl.find('.subtitles-menu').html,
+                    window.edx.HtmlUtils.joinHtml(
+                        window.edx.HtmlUtils.HTML('<li>'),
+                        window.gettext('Transcript will be displayed when you start playing the video.'), // jshint ignore:line
+                        window.edx.HtmlUtils.HTML('</li>')
+                    )
+                );
+            },
+
             /**
             * @desc Fetch the caption file specified by the user. Upon successful
             *     receipt of the file, the captions will be rendered.
@@ -528,9 +541,7 @@
                             }
                         } else {
                             if (state.isTouch) {
-                                self.subtitlesEl.find('.subtitles-menu').html(
-                                    '<li>' + gettext('Transcript will be displayed when you start playing the video.') + '</li>' // jshint ignore:line
-                                );
+                                this.showTemporaryCaptionMessage(self);
                             } else {
                                 self.renderCaption(start, captions);
                             }
@@ -738,20 +749,25 @@
                     self.rendered = true;
                     self.state.el.addClass('is-captions-rendered');
 
-                    self.subtitlesEl.attr('aria-label', gettext('Video transcript: activating an item in this group will spool the video to the corresponding time point.')) // jshint ignore:line
-                        .find('.transcript-title')
-                            .html(gettext('Video transcript'));
+                    self.showTemporaryCaptionMessage(self);
+
+                    self.subtitlesEl
+                        .attr('aria-label', window.gettext('Activating a link in this group will skip to the corresponding point in the video.')); // jshint ignore:line
+
+                    self.subtitlesEl.find('.transcript-title')
+                        .text(window.gettext('Video transcript'));
 
                     self.subtitlesEl.find('.transcript-start')
-                        .html(gettext('Start of transcript. Skip to the end.'));
+                        .text(window.gettext('Start of transcript. Skip to the end.'));
 
                     self.subtitlesEl.find('.transcript-end')
-                        .html(gettext('End of transcript. Skip to the start.'));
+                        .text(window.gettext('End of transcript. Skip to the start.'));
 
                     self.container.find('.menu-container .control')
-                        .attr('aria-label', gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')) // jshint ignore:line
-                        .find('.control-text')
-                            .html(gettext('Open langage menu.'));
+                        .attr('aria-label', window.gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
+
+                    self.container.find('.menu-container .control .control-text')
+                        .text(window.gettext('Open language menu.'));
                 };
 
                 this.rendered = false;
@@ -1106,14 +1122,14 @@
                 this.captionControlEl
                     .addClass('is-active')
                     .find('.control-text')
-                        .text(gettext('Hide closed captions'));
+                        .text(window.gettext('Hide closed captions'));
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
                         .text(this.subtitlesEl.find('.current').text());
                 } else {
                     this.captionDisplayEl
-                        .text(gettext('(Caption will be displayed when you start playing the video.)'));
+                        .text(window.gettext('(Caption will be displayed when you start playing the video.)'));
                 }
             },
 
@@ -1127,7 +1143,7 @@
                 this.captionControlEl
                     .removeClass('is-active')
                     .find('.control-text')
-                        .text(gettext('Turn on closed captioning'));
+                        .text(window.gettext('Turn on closed captioning'));
             },
 
             updateCaptioningCookie: function(method) {
@@ -1162,7 +1178,7 @@
                 if (hide_captions) {
                     state.captionsHidden = true;
                     state.el.addClass('closed');
-                    text = gettext('Turn on transcripts');
+                    text = window.gettext('Turn on transcripts');
                     if (trigger_event) {
                         this.state.el.trigger('captions:hide');
                     }
@@ -1170,12 +1186,12 @@
                     transcriptControlEl
                         .removeClass('is-active')
                         .find('.control-text')
-                            .text(gettext(text));
+                            .text(window.gettext(text));
                 } else {
                     state.captionsHidden = false;
                     state.el.removeClass('closed');
                     this.scrollCaption();
-                    text = gettext('Turn off transcripts');
+                    text = window.gettext('Turn off transcripts');
                     if (trigger_event) {
                         this.state.el.trigger('captions:show');
                     }
@@ -1183,7 +1199,7 @@
                     transcriptControlEl
                         .addClass('is-active')
                         .find('.control-text')
-                            .text(gettext(text));
+                            .text(window.gettext(text));
                 }
 
                 if (state.resizer) {
