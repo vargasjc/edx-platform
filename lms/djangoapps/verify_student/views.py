@@ -30,7 +30,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce.utils import audit_log
+from commerce.utils import audit_log, EcommerceService
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
@@ -426,6 +426,12 @@ class PayAndVerifyView(View):
             'is_ab_testing': 'begin-flow' in request.path,
         }
 
+        ecommerce_service = EcommerceService()
+        if ecommerce_service.is_enabled(request.user):
+            context.update({
+                'use_ecommerce_payment_flow': True,
+                'ecommerce_checkout_page': ecommerce_service.checkout_page_url(relevant_course_mode.sku),
+            })
         return render_to_response("verify_student/pay_and_verify.html", context)
 
     def _redirect_if_necessary(
