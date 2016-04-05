@@ -1259,7 +1259,7 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'js/vendor/backbone-min.js'
+    'common/js/vendor/backbone-min.js'
 ]
 
 main_vendor_js = base_vendor_js + [
