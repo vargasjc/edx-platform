@@ -451,7 +451,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
     @staticmethod
     def safe_parse_date(date):
         """
-        Since this is used soley for ordering purposes, use today's date as a default
+        Since this is used solely for ordering purposes, use today's date as a default
         """
         try:
             return datetime.strptime(date, '%B %d, %Y')

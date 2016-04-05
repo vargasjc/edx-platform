@@ -53,13 +53,21 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
 
         setAndValidate: function(attr, value) {
             if (attr === 'date') {
+                // If the value to be set was typed, validate that entry rather than the current datepicker value
+                if (this.dateEntry(event).length > 0) {
+                    value = DateUtils.parseDateFromString(this.dateEntry(event).val());
+                    if (value && isNaN(value.getTime())) {
+                        value = "";
+                    }
+                }
                 value = $.datepicker.formatDate("MM d, yy", value);
             }
             var targetModel = this.collection.get(this.$currentPost.attr('name'));
             var prevValue = targetModel.get(attr);
-            if (prevValue === value) { return; }
-            targetModel.set(attr, value);
-            this.validateModel(targetModel);
+            if (prevValue !== value) {
+                targetModel.set(attr, value);
+                this.validateModel(targetModel);
+            }
         },
 
         handleValidationError : function(model, error) {
@@ -67,7 +75,9 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
             $(ele).find('.message-error').remove();
             for (var field in error) {
                 if (error.hasOwnProperty(field)) {
-                    $(ele).find('#update-date-'+model.cid).parent().append(this.errorTemplate({message : error[field]}));
+                    $(ele).find('#update-date-'+model.cid).parent().append(
+                        this.errorTemplate({message : error[field]})
+                    );
                     $(ele).find('.date-display').parent().append(this.errorTemplate({message : error[field]}));
                 }
             }
@@ -171,11 +181,11 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
             var $textArea = this.$currentPost.find(".new-update-content").first();
             var targetModel = this.eventModel(event);
             // translate long-form date (for viewing) into short-form date (for input)
-            if (targetModel.get('date')) {
+            if (targetModel.get('date') && targetModel.isValid()) {
                 $(this.dateEntry(event)).val($.datepicker.formatDate("mm/dd/yy", new Date(targetModel.get('date'))));
             }
             else {
-                $(this.dateEntry(event)).val("");
+                $(this.dateEntry(event)).val("MM/DD/YY");
             }
             this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
                 targetModel, 'content', self.options['base_asset_url'], $textArea.get(0));
