@@ -13,7 +13,7 @@ class ModuleStoreSerializer(object):
     There will also be a "relationships" csv with information about
     which xblocks are children of each other.
     """
-    def __init__(self, csv_dir, neo4j_root=None):
+    def __init__(self, csv_dir, neo4j_root):
         self.csv_dir = csv_dir
         self.neo4j_root = neo4j_root
 
