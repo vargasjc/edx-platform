@@ -9,7 +9,9 @@ import os
 class ModuleStoreSerializer(object):
     """
     Class with functionality to serialize a modulestore to CSVs:
-    One document with information on kinds of
+    Each csv will have information about one kind of xblock.
+    There will also be a "relationships" csv with information about
+    which xblocks are children of each other.
     """
     def __init__(self, csv_dir, neo4j_root=None):
         self.csv_dir = csv_dir
@@ -23,12 +25,13 @@ class ModuleStoreSerializer(object):
         for index, course in enumerate(self.all_courses):
             self.dump_course_items_to_csv(course.id)
 
-    def dump_course_items_to_csv(course_key):
-        blocks_by_type = self.serialize_items(items, course.id)
+    def dump_course_items_to_csv(self, course_key):
+        items = modulestore().get_items(course_key)
+        blocks_by_type = self.serialize_items(items, course_key)
         self.dump_blocks_to_csv(blocks_by_type)
 
         relationships = self.get_relationships_from_items(items)
-        self.dump_relationships_to_csv()
+        self.dump_relationships_to_csv(relationships)
 
     def dump_blocks_to_csv(self, blocks_by_type):
         for block_type, serialized_xblocks in blocks_by_type.iteritems():
@@ -54,11 +57,11 @@ class ModuleStoreSerializer(object):
                 writer.writerows(rows)
 
     def dump_relationships_to_csv(self, relationships):
-        rows = [] if create else []
+        rows = []
         rows.extend(relationships)
         with open('{csv_dir}/relationships.csv'.format(csv_dir=self.csv_dir), 'a') as csvfile:
             # if this file hasn't been written to yet, add a header
-            writer = csv.writer(output_file)
+            writer = csv.writer(csvfile)
             if csvfile.tell() == 0:
                 writer.writerow([':START_ID', ':END_ID'])
 
@@ -76,13 +79,13 @@ class ModuleStoreSerializer(object):
 
         return value
 
-    def get_field_names_for_type(block_type, serialized_xblocks):
-        field_names = self.field_names_by_type.get(block_type)
+    def get_field_names_for_type(self, block_type, serialized_xblocks):
+        field_names = self.field_names_by_block_type.get(block_type)
         if field_names is None:
             field_names = serialized_xblocks[0].keys()
             field_names.remove('type:LABEL') ## this needs to be first for some reason
             field_names = ['type:LABEL'] + field_names
-            self.field_names_by_type[block_type] = field_names
+            self.field_names_by_block_type[block_type] = field_names
 
         return field_names
 
@@ -111,17 +114,17 @@ class ModuleStoreSerializer(object):
         if 'checklists' in fields:
             del fields['checklists']
 
-        fields['org'] = course.id.org
-        fields['course'] = course.id.course
-        fields['run'] = course.id.run
-        fields['course_key'] = unicode(course.id)
+        fields['org'] = course_key.org
+        fields['course'] = course_key.course
+        fields['run'] = course_key.run
+        fields['course_key'] = unicode(course_key)
 
         return fields, block_type
 
-    def serialize_items(items, course_key):
+    def serialize_items(self, items, course_key):
         blocks_by_type = defaultdict(list)
         for item in items:
-            serialized_item, block_type = self.serialize_item(item, course.id)
+            serialized_item, block_type = self.serialize_item(item, course_key)
             blocks_by_type[block_type].append(serialized_item)
 
         return blocks_by_type
@@ -145,6 +148,19 @@ class Command(BaseCommand):
     a REST api)
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument('--neo4j_root',
+            action='store',
+            dest='neo4j_root',
+            default="/tmp/neo4j",
+            help='where to run neo4j command from')
+
+        parser.add_argument('--csv_dir',
+            action='store',
+            dest='csv_dir',
+            default="/tmp/csvs",
+            help='where to dump csv files to')
+
     def handle(self, *args, **options):
         csv_dir = options["csv_dir"]
         neo4j_root = options["neo4j_root"]
@@ -162,8 +178,10 @@ class Command(BaseCommand):
         for filename in os.listdir(module_store_serializer.csv_dir):
             if filename.endswith(".csv") and filename != "relationships.csv":
                 name = filename[:-4]  # cut off .csv
-                node_info = " --nodes:{name} coursegraph2/{filename}".format(
-                    name=name, filename=filename
+                node_info = " --nodes:{name} {csv_dir}/{filename}".format(
+                    csv_dir=module_store_serializer.csv_dir,
+                    name=name,
+                    filename=filename,
                 )
                 command += node_info
 
