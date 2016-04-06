@@ -531,13 +531,13 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Welcome to edX.'))
 
         # open video "B"
-        self.course_nav.go_to_sequential('B')
+        self.course_nav.go_to_sequential('Test Vertical-1')
 
         # check if we can download transcript in "txt" format that has text "Equal transcripts"
         self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
 
         # open video "C"
-        self.course_nav.go_to_sequential('C')
+        self.course_nav.go_to_sequential('Test Vertical-2')
 
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_present('download_transcript'))
@@ -683,17 +683,17 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # select the "2.0" speed on video "A"
-        self.course_nav.go_to_sequential('A')
+        self.course_nav.go_to_sequential('Test Vertical-0')
         self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
-        self.course_nav.go_to_sequential('B')
+        self.course_nav.go_to_sequential('Test Vertical-1')
         self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
-        self.course_nav.go_to_sequential('C')
+        self.course_nav.go_to_sequential('Test Vertical-2')
         self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
@@ -702,7 +702,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.verify_speed_changed('0.75x')
 
         # open video "A"
-        self.course_nav.go_to_sequential('A')
+        self.course_nav.go_to_sequential('Test Vertical-0')
 
         # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
@@ -711,7 +711,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.reload_page()
 
         # open video "A"
-        self.course_nav.go_to_sequential('A')
+        self.course_nav.go_to_sequential('Test Vertical-0')
 
         # check if video "A" should start playing at speed "2.0"
         self.assertEqual(self.video.speed, '2.0x')
@@ -720,13 +720,13 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.speed = '1.0'
 
         # open video "B"
-        self.course_nav.go_to_sequential('B')
+        self.course_nav.go_to_sequential('Test Vertical-1')
 
         # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
         # open video "C"
-        self.course_nav.go_to_sequential('C')
+        self.course_nav.go_to_sequential('Test Vertical-2')
 
         # The change of speed for Video "A" should  impact Video "C" because it still has
         # not been explicitly set to a speed.
