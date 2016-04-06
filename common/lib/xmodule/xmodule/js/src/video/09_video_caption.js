@@ -4,7 +4,7 @@
 
     define('video/09_video_caption.js', [
         'video/00_sjson.js',
-        'video/00_async_process.js'
+        'video/00_async_process.js',
     ],
     function (Sjson, AsyncProcess) {
 
@@ -470,7 +470,7 @@
 
             /**
             * @desc HtmlUtils isn't available when running tests so this function
-            *       escapes certain characters when outputting HTML or strings 
+            *       escapes certain characters when outputting HTML or strings
             *       as a fallback. Once HtmlUtils is made available to xblocks
             *       in testing, we can replace this function with those methods.
             */

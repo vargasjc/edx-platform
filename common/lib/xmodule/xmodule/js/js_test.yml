@@ -60,7 +60,6 @@ lib_paths:
     - common_static/js/src/accessibility_tools.js
     - common_static/js/vendor/moment.min.js
     - spec/main_requirejs.js
-    - common_static/edx-ui-toolkit/js/utils/html-utils.js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
