@@ -66,7 +66,6 @@
       line-height: 30px;
       color: #646464;
       letter-spacing: 1px;
-      text-transform: uppercase;
     }
 
     h3 {
@@ -76,10 +75,9 @@
     }
 
     .message-error {
-      @extend %t-copy-sub1;
-      margin-top: ($baseline/4);
-      margin-bottom: ($baseline/2);
-      color: $red;
+        border: 0.0625rem solid #fdbc56;
+        border-radius: 0.3125rem;
+        display: inline-block;
     }
   }
 
