@@ -14,8 +14,10 @@ source =
 omit =
     cms/envs/*
     cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
     cms/djangoapps/*/migrations/*
     cms/djangoapps/*/features/*
+    lms/debug/*
     lms/envs/*
     lms/djangoapps/*/migrations/*
     lms/djangoapps/*/features/*
