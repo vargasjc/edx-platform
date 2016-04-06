@@ -35,6 +35,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
+from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -133,6 +134,17 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.WEBCAM_REQ,
         ])
         self._assert_upgrade_session_flag(False)
+
+    def test_start_flow_with_ecommerce(self):
+        """Verify ecommerce variables are sent when ecommerce checkout is enabled."""
+        CommerceConfiguration.objects.create(
+            checkout_on_ecommerce_service=True,
+            single_course_checkout_page='/test_basket/'
+        )
+        course = self._create_course('verified')
+        self._enroll(course.id)
+        response = self._get_page('verify_student_start_flow', course.id)
+        self.assertTrue(response.context['use_ecommerce_payment_flow'])
 
     @ddt.data(
         ("no-id-professional", "verify_student_start_flow"),
