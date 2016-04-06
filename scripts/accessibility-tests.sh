@@ -9,3 +9,6 @@ SELENIUM_BROWSER=phantomjs paver test_a11y
 
 echo "Generating coverage report..."
 paver a11y_coverage
+
+# TODO: remove this before merging
+scripts/accessibility-crawler.sh
