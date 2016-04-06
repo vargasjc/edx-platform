@@ -468,16 +468,26 @@
                 };
             },
 
-            showTemporaryCaptionMessage: function(self) {
+            /**
+            * @desc HtmlUtils isn't available when running tests so this function
+            *       escapes certain characters when outputting HTML or strings 
+            *       as a fallback. Once HtmlUtils is made available to xblocks
+            *       in testing, we can replace this function with those methods.
+            */
+            showTemporaryCaptionMessage: function(self, string) {
 
-                window.edx.HtmlUtils.setHtml(
-                    self.subtitlesEl.find('.subtitles-menu').html,
-                    window.edx.HtmlUtils.joinHtml(
-                        window.edx.HtmlUtils.HTML('<li>'),
-                        window.gettext('Transcript will be displayed when you start playing the video.'), // jshint ignore:line
-                        window.edx.HtmlUtils.HTML('</li>')
-                    )
-                );
+                var entityMap = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    "/": '&#x2F;'
+                };
+
+                return String(string).replace(/[&<>"'\/]/g, function (s) {
+                    return window.gettext(entityMap[s]);
+                });
             },
 
             /**
@@ -541,7 +551,7 @@
                             }
                         } else {
                             if (state.isTouch) {
-                                this.showTemporaryCaptionMessage(self);
+                                this.showTemporaryCaptionMessage(self, "<li>Transcript will be displayed when you start playing the video.</li>"); // jshint ignore: line
                             } else {
                                 self.renderCaption(start, captions);
                             }
@@ -749,7 +759,7 @@
                     self.rendered = true;
                     self.state.el.addClass('is-captions-rendered');
 
-                    self.showTemporaryCaptionMessage(self);
+                    self.showTemporaryCaptionMessage(self, "<li>Transcript will be displayed when you start playing the video.</li>"); // jshint ignore: line
 
                     self.subtitlesEl
                         .attr('aria-label', window.gettext('Activating a link in this group will skip to the corresponding point in the video.')); // jshint ignore:line
