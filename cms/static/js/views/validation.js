@@ -10,7 +10,7 @@ var ValidatingView = BaseView.extend({
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
-    errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
+    errorTemplate : _.template('<span class="message-error"><%- message %></span>'),
 
     save_title: gettext("You've made some changes"),
     save_message: gettext("Your changes will not take effect until you save your progress."),
@@ -60,7 +60,7 @@ var ValidatingView = BaseView.extend({
         // Set model field and return the new value.
         this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
-        var newVal = ''
+        var newVal = '';
         if(event.currentTarget.type == 'checkbox'){
             newVal = $(event.currentTarget).is(":checked").toString();
         }else{
