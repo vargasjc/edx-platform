@@ -3,13 +3,13 @@ Django admin dashboard configuration for LMS XBlock infrastructure.
 """
 
 from django.contrib import admin
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from config_models.admin import ConfigurationModelAdmin
 from mobile_api.models import MobileApiConfig, AppVersionConfig
 
 admin.site.register(MobileApiConfig, ConfigurationModelAdmin)
 
 
-class AppVersionConfigAdmin(KeyedConfigurationModelAdmin):
+class AppVersionConfigAdmin(admin.ModelAdmin):
     """ Admin class for AppVersionConfig model """
     fields = ('platform', 'version', 'expire_at', 'enabled')
     list_filter = ['platform']
@@ -19,6 +19,6 @@ class AppVersionConfigAdmin(KeyedConfigurationModelAdmin):
 
     def get_list_display(self, __):
         """ defines fields to display in list view """
-        return ['change_date', 'changed_by', 'platform', 'version', 'expire_at', 'enabled', 'edit_link']
+        return ['platform', 'version', 'expire_at', 'enabled', 'created_at', 'updated_at']
 
 admin.site.register(AppVersionConfig, AppVersionConfigAdmin)
