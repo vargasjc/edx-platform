@@ -20,7 +20,7 @@ function($, date, TriggerChangeEventOnEnter) {
             if (newVal) {
                 if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
                     cacheview.clearValidationErrors();
-                    cacheview.setAndValidate(event, fieldName, newVal);
+                    cacheview.setAndValidate(fieldName, newVal, event);
                 }
             }
             else {
@@ -28,7 +28,7 @@ function($, date, TriggerChangeEventOnEnter) {
                 // Note also that the validation logic prevents us from clearing the start date
                 // (start date is required by the back end).
                 cacheview.clearValidationErrors();
-                cacheview.setAndValidate(event, fieldName, null);
+                cacheview.setAndValidate(fieldName, null, event);
             }
         };
 
@@ -60,10 +60,7 @@ function($, date, TriggerChangeEventOnEnter) {
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
         // UTC timezone, NOT the timezone of the user's browser.
-        var date = null, time = null;
-        if (datepickerInput.length > 0) {
-            date = $(datepickerInput).datepicker("getDate");
-        }
+        var date = $(datepickerInput).datepicker("getDate"), time = null;
         if (timepickerInput.length > 0) {
             time = $(timepickerInput).timepicker("getTime");
         }

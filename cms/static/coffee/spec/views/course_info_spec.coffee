@@ -153,17 +153,19 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             it "does not remove existing course info on click outside modal", ->
                 @cancelExistingCourseInfo(false)
 
-            it "does not allow updates to be saved with an invalid date", ->
+            @testInvalidDateValue: (value) ->
                 @courseInfoEdit.onNew(@event)
-                @courseInfoEdit.$el.find('input.date').val("Marchtober 40, 2048")
-                @courseInfoEdit.$el.find('input.date').change()
+                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
+                @courseInfoEdit.$el.find('input.date').val(value).trigger("change")
                 expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+                @courseInfoEdit.$el.find('input.date').val("01/01/16").trigger("change")
+                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
+
+            it "does not allow updates to be saved with an invalid date", ->
+                @testInvalidDateValue("Marchtober 40, 2048")
 
             it "does not allow updates to be saved with a blank date", ->
-                @courseInfoEdit.onNew(@event)
-                @courseInfoEdit.$el.find('input.date').val("")
-                @courseInfoEdit.$el.find('input.date').change()
-                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+                @testInvalidDateValue("")
 
 
         describe "Course Updates WITH Push notification", ->
