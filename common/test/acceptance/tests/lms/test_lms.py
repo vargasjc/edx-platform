@@ -827,10 +827,10 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual([u'Visible Unit'], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Locked Subsection")
-        self.assertEqual([u'Locked Subsection'], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
     def test_visible_to_student(self):
         """
@@ -849,7 +849,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual([u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual([u'Visible Unit'], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
 @attr('shard_1')
