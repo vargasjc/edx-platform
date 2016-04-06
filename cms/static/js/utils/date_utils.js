@@ -14,13 +14,13 @@ function($, date, TriggerChangeEventOnEnter) {
         var datefield = $(div).find("input.date");
         var timefield = $(div).find("input.time");
         var cacheview = view;
-        var setfield = function () {
+        var setfield = function (event) {
             var newVal = getDate(datefield, timefield),
                 oldTime = new Date(cacheModel.get(fieldName)).getTime();
             if (newVal) {
                 if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
                     cacheview.clearValidationErrors();
-                    cacheview.setAndValidate(fieldName, newVal);
+                    cacheview.setAndValidate(event, fieldName, newVal);
                 }
             }
             else {
@@ -28,7 +28,7 @@ function($, date, TriggerChangeEventOnEnter) {
                 // Note also that the validation logic prevents us from clearing the start date
                 // (start date is required by the back end).
                 cacheview.clearValidationErrors();
-                cacheview.setAndValidate(fieldName, null);
+                cacheview.setAndValidate(event, fieldName, null);
             }
         };
 

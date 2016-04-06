@@ -51,7 +51,7 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
             return "course-update-list li[name=" + uid + "]";
         },
 
-        setAndValidate: function(attr, value) {
+        setAndValidate: function(event, attr, value) {
             if (attr === 'date') {
                 // If the value to be set was typed, validate that entry rather than the current datepicker value
                 if (this.dateEntry(event).length > 0) {

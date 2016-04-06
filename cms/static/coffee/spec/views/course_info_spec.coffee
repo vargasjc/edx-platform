@@ -153,6 +153,19 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             it "does not remove existing course info on click outside modal", ->
                 @cancelExistingCourseInfo(false)
 
+            it "does not allow updates to be saved with an invalid date", ->
+                @courseInfoEdit.onNew(@event)
+                @courseInfoEdit.$el.find('input.date').val("Marchtober 40, 2048")
+                @courseInfoEdit.$el.find('input.date').change()
+                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+
+            it "does not allow updates to be saved with a blank date", ->
+                @courseInfoEdit.onNew(@event)
+                @courseInfoEdit.$el.find('input.date').val("")
+                @courseInfoEdit.$el.find('input.date').change()
+                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+
+
         describe "Course Updates WITH Push notification", ->
             courseInfoTemplate = readFixtures('course_info_update.underscore')
 
