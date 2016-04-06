@@ -1,7 +1,11 @@
-AFontGarde('FontAwesome', {
-    glyphs: '&#61515;'
-});
+(function() {
+    'use strict';
 
-AFontGarde('edx-icons', {
-    glyphs: '\uE621\uE622\uE623'
+    window.AFontGarde('FontAwesome', {
+        glyphs: '&#61515;'
+    });
+
+    window.AFontGarde('edx-icons', {
+        glyphs: '\uE621\uE622\uE623'
+    });
 });
