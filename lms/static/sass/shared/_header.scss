@@ -1377,35 +1377,5 @@ header.global-edxss {
   }
 }
 
-.view-register header.global-new .cta-register {
-  text-decoration: none;
-  color: $courseware-hover-color;
-  border-bottom-color: $courseware-border-bottom-color;
-}
-
-.view-login header.global-new .cta-login {
-  text-decoration: none;
-  color: $courseware-hover-color;
-}
-
-// marketing site design syncing
-.view-register, .view-login {
-
-  header.global nav {
-    width: 960px;
-  }
-}
-
-// page-based nav states
-.view-howitworks .nav-global-01,
-.view-courses .nav-global-02,
-.view-schools .nav-global-03,
-.view-register .nav-global-04 {
-
-  a {
-    text-decoration: none;
-    color: $link-color !important;
-  }
-}
 
 
