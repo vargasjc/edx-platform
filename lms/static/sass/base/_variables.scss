@@ -436,14 +436,14 @@ $container-bg: $white !default;
 
 // header
 $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9)) !default;
-$header-bg: $white !default;
+$header-bg: rgb(225,229,227) !default; //$header-bg: $white !default;
 $header-graphic-super-color: $m-blue-d1;
 $header-graphic-sub-color: $m-gray-d2;
 $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif !default;
 $header_image_margin: -69px !default;
 
 // footer
-$footer-bg: $white !default;
+$footer-bg: rgb(225,229,227) !default; //$footer-bg: $white !default;
 $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0 !default;
 
 // modal
@@ -456,7 +456,7 @@ $courseware-header-bg: transparent !default;
 $courseware-footer-border: none !default;
 $courseware-footer-shadow: none !default;
 $courseware-footer-margin: 0px !default;
-$courseware-border-bottom-color: rgb(68,162,222) !default;
+$courseware-border-bottom-color: rgb(145,145,145) !default; //$courseware-border-bottom-color: rgb(68,162,222) !default;
 $courseware-button-border-color: rgb(230,230,230) !default;
 $courseware-hover-color: rgb(51,52,53) !default;
 $courseware-navigation-color: $blue !default;
@@ -469,7 +469,7 @@ $course-card-height: ($baseline*18) !default;
 $course-image-height: ($baseline*8) !default;
 $course-info-height: ($baseline*10) !default;
 $course-title-height: ($baseline*3.6) !default;
-$homepage-bg-image: none !default;
+$homepage-bg-image: url('#{$static-path}/images/homepage.jpg') !default; //$homepage-bg-image: none !default;
 $login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
 $register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
 $passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
