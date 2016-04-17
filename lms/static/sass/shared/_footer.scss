@@ -395,7 +395,8 @@ footer#footer-edxss {
     }
 
     .wrapper-logo {
-      margin: ($baseline*0.75) 0;
+      margin: 0 ($baseline*2) 0 0; //margin: ($baseline*0.75) 0;
+      float: left;
 
       a {
         display: inline-block;
