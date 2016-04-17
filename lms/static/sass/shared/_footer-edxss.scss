@@ -5,8 +5,8 @@
 @import 'neat/neat'; // lib - Neat
 
 
-$edx-footer-link-color: $link-color;
-$edx-footer-bg-color: rgb(252,252,252);
+$edxss-footer-link-color: $link-color;
+$edxss-footer-bg-color: $footer-bg;
 
 
 // Aggressively scoped for Drupal
@@ -14,8 +14,8 @@ $edx-footer-bg-color: rgb(252,252,252);
 // These styles are being loaded on Drupal, LMS and WordPress
 // sites so the scope has to be aggressive to override default
 // CMS styles
-footer#footer-edx-v3 {
-  background: $edx-footer-bg-color;
+footer#footer-edxss {
+  background: $edxss-footer-bg-color;
   padding: 20px;
   border-top: 1px solid $courseware-button-border-color;
 
@@ -36,7 +36,7 @@ footer#footer-edx-v3 {
       @include font-size(14);
       @include line-height(14);
       @include margin-right(20px);
-      color: $edx-footer-link-color;
+      color: $edxss-footer-link-color;
 
       &:last-of-type {
         @include margin-right(0);
@@ -118,7 +118,7 @@ footer#footer-edx-v3 {
 
     .icon {
       font-family: 'FontAwesome';
-      color: $edx-footer-link-color;
+      color: $edxss-footer-link-color;
     }
   }
 
