@@ -21,19 +21,14 @@ from microsite_configuration import microsite
   <header>
     <div class="outer-wrapper">
       <div class="title">
-        <hgroup>
+        <div class="heading-group">
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
-            % if self.stanford_theme_enabled():
-              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
-              <h2>${_("For anyone, anywhere, anytime")}</h2>
-            % else:
               <h1>${_("Learn at the <strong>PWS Global Service Center</strong>")}</h1>
               <p>${_("Keep up to date on your technical knowledge directly from the experts!")}</p>
-            % endif
           % endif
-        </hgroup>
+        </div>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
           <div class="course-search">
             <form method="get" action="/courses">
