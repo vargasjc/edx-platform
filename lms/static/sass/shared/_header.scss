@@ -1377,5 +1377,14 @@ header.global-edxss {
   }
 }
 
+#lms-su-header {
+    background: rgba(140, 21, 21, 1);
+    box-shadow: inset 0 -4px 8px -2px rgba(0, 0, 0, 0.2);
+    min-height: 30px;
+}
 
+#lms-su-header .lms-su-container, #lms-su-footer .lms-su-container {
+    width: 724px;
+    margin: 0 auto;
+}
 
