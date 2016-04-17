@@ -305,7 +305,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 // Inspired by original Open edX theme and modified thereon....
 // ====================
 
-footer#footer-openedx {
+footer#footer-edxss {
     @include clearfix();
     @include box-sizing(border-box);
     @include outer-container;
