@@ -177,7 +177,7 @@ FEATURES = {
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
-    'ENABLE_FEEDBACK_SUBMISSION': False,
+    'ENABLE_FEEDBACK_SUBMISSION': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
     # sandbox, for testing whether it's enabled properly.
@@ -330,7 +330,7 @@ FEATURES = {
     'ENABLE_EDXNOTES': False,
 
     # Milestones application flag
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Organizations application flag
     'ORGANIZATIONS_APP': False,
@@ -397,6 +397,9 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
+    
+    # Disable course creation for non-staff
+    'DISABLE_COURSE_CREATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
