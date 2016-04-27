@@ -140,10 +140,10 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': True,
 
     # Milestones application flag
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Prerequisite courses feature flag
-    'ENABLE_PREREQUISITE_COURSES': False,
+    'ENABLE_PREREQUISITE_COURSES': True,
 
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
@@ -179,7 +179,7 @@ FEATURES = {
     'ALLOW_HIDING_DISCUSSION_TAB': False,
 
     # Special Exams, aka Timed and Proctored Exams
-    'ENABLE_SPECIAL_EXAMS': False,
+    'ENABLE_SPECIAL_EXAMS': True,
 
     'ORGANIZATIONS_APP': False,
 }
